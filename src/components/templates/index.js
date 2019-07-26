@@ -6,9 +6,11 @@
 // TODO: Use dynamic loading to prevent all templates to be loaded at once.
 import DefaultTemplate from "./default";
 import CustomTemplate from "./customTemplate";
+import SUTDTemplate from "./SUTDTemplate";
 
 export default {
   default: DefaultTemplate,
   CUSTOM_TEMPLATE: CustomTemplate,
+  SUTD_TEMPLATE: SUTDTemplate,
   NULL: []
 };
