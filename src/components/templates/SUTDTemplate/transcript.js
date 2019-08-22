@@ -2,9 +2,11 @@ import PropTypes from "prop-types";
 import React, { Component } from "react";
 import { get } from "lodash";
 import _ from "lodash";
-
 import {  SUTD_CERT_LOGO,
-  SUTD_SEAL
+  SUTD_SEAL,
+  SUTD_FOOTER_1,
+  SUTD_FOOTER_2,
+  SUTD_FOOTER_3
 } from "./images";
 
 export const TIMEZONE = "Asia/Singapore";
@@ -16,7 +18,7 @@ export const formatDateFullMonthProper = dateString => {
 };
 
 const GothamMedium12pt = {
-  fontFamily: "Gotham Medium",
+  fontFamily: "Arial",
   fontSize: "1.5em",
   textAlign: "center",
   color: "brown"
@@ -58,17 +60,18 @@ const Arial15ptp = {
   textAlign: "left",
   color: "Black",
   "white-space": "pre-wrap",
-  marginLeft: "2rem"
+  marginLeft: "2rem",
+  textTransform: "uppercase"
 };
 
 const Arial14ptp = {
   fontFamily: "Arial",
-  fontSize: "14px",
+  fontSize: "16px",
   fontStyle: "Bold",
   textAlign: "left",
   color: "Black",
   "white-space": "pre-wrap",
-  marginLeft: "1rem"
+
 };
 
 export const thWidth60Left = {
@@ -76,8 +79,22 @@ export const thWidth60Left = {
   textAlign: "left"
 };
 
-export const SubjectGrades = ({ certificate }) => {
-  const semesters = _(certificate.transcript)
+export const Plan =({ document }) => {
+	
+	const DegreePlan = get(document, "recipient.TransPlan",undefined);
+	return DegreePlan ? (
+    <div className="row">
+       <div className="col-2"> <span style={Arial15pt}>Plan :</span></div>
+        <div className="col-5">
+          {" "}
+          <span style={Arial15pt}><strong>{document.recipient.TransPlan}</strong></span>
+        </div>
+    </div>) : <br/>;
+ 	
+};
+
+export const SubjectGrades = ({ document }) => {
+  const semesters = _(document.transcript)
     .groupBy(t => t.semester, t => t.cumGPA)
     .map((values, key) => ({
       semester: key,
@@ -88,7 +105,7 @@ export const SubjectGrades = ({ certificate }) => {
 
   const semesterHeader = s => (
     <div className="row">
-      <div className="semester-header exemption col-12">{s.semester}</div>
+      <div className="semester-header exemption col-12"><span style={Arial15pt}>{s.semester}</span></div>
     </div>
   );
 
@@ -121,21 +138,22 @@ export const SubjectGrades = ({ certificate }) => {
     return (
       <div key={j}>
         {semesterHeader(s)}
+		<br/>
         {semesterSubjects}
         <br />
 
         <div className="row">
           <div className="col-3">
-            Term Grade Point Average : 
+            <span style={Arial15pt}>Term Grade Point Average : </span>
           </div>
 		  <div className="col-7">
-			<strong>{tgpa}</strong>
+			<span style={Arial15pt}><strong>{tgpa}</strong></span>
           </div>
           <div className="col-3">
-            Cumulative Grade Point Average :
+            <span style={Arial15pt}>Cumulative Grade Point Average :</span>
           </div>
           <div className="col-7">
-             <strong>{cgpa}</strong>
+             <span style={Arial15pt}><strong>{cgpa}</strong></span>
           </div>		  
           <div className="col-6">&nbsp;</div>
           <div>
@@ -149,7 +167,90 @@ export const SubjectGrades = ({ certificate }) => {
   return <div>{subjects}</div>;
 };
 
-const Transcript = ({ certificate }) => (
+
+export const RemarksFooter =({ document }) => {
+	
+	const Remarks = get(document, "additionalData.Remarks",undefined);
+	return Remarks ? (
+	<div>
+		<hr align="center" width="100%" color="black" />
+		<div className="row">
+			<div className="col-5">
+				<span style={Arial15pt}>Remarks:</span>
+			</div>
+		</div>
+		<br/>
+		<div className="row">
+			<span style={Arial15ptp}>{document.additionalData.Remarks}</span>
+		</div>
+	</div>
+  ) :null ;
+	
+};
+
+export const ThesisFooter =({ document }) => {
+	
+	const Thesis = get(document, "additionalData.Thesis",undefined);
+	return Thesis ? (
+	<div>
+		<div className="row">
+			<div className="col-9">
+				<span style={Arial15pt}>Thesis Title: {document.additionalData.Thesis}</span>
+			</div>
+		</div>
+	<br/>
+	</div>
+  ) :null ;
+	
+};
+
+export const DegreeFooter =({ document }) => {
+	
+	const Degree = get(document, "additionalData.Degree2",undefined);
+	return Degree ? (
+	<div>
+		<div className="row">
+			<div className="col-5">
+				<span style={Arial15pt}>Conferred the degree(s) of:</span>
+			</div>
+		</div>
+		<br/>
+		<ul>
+			<li><span style={Arial14ptp}>{document.additionalData.Degree}</span></li>
+			<li><span style={Arial14ptp}>{document.additionalData.Degree2}</span></li>
+		</ul>
+
+		<div className="row">
+			<div className="col-5">
+				<span style={Arial15pt}>On: {formatDateFullMonthProper(document.issuedOn)}</span>
+			</div>
+		</div>
+		
+	</div>
+  ) :(
+	<div>
+		<div className="row">
+			<div className="col-5">
+				<span style={Arial15pt}>Conferred the degree(s) of:</span>
+			</div>
+		</div>
+		<br/>
+		<ul>
+			<li><span style={Arial14ptp}>{document.additionalData.Degree}</span></li>
+		</ul>
+
+		<div className="row">
+			<div className="col-5">
+				<span style={Arial15pt}>On: {formatDateFullMonthProper(document.issuedOn)}</span>
+			</div>
+		</div>
+		
+	</div>
+  ) ;
+	
+};
+
+const Transcript = ({ document }) => (
   <div className="container">
     <div className="transcript-content">
       <style>
@@ -163,6 +264,7 @@ const Transcript = ({ certificate }) => (
 	  .Title2 {
         padding-top:1em;
         float:left;
+		font-family: Arial;
         font-size:1.5em;
 		font-weight:bold
       }
@@ -214,9 +316,12 @@ const Transcript = ({ certificate }) => (
         text-transform: none;
       }
 
-      .credit-unit,
-      .grade {
+      .credit-unit {
         text-align: center
+      }
+	  
+      .grade {
+        text-align: left
       }
 	  
       .name {
@@ -249,34 +354,34 @@ const Transcript = ({ certificate }) => (
       <div className="row">
         <hr align="center" width="100%" color="brown" />
       </div>
-      <br />
-      <br />
+
 
       <div className="row">
         <div className="col-7">
-          <span style={Arial12pt}>{certificate.recipient.name}</span>
+          <span style={Arial12pt}>{document.recipient.name}</span>
         </div>
-
+		<br/>
+		<br/>
         <div className="col-7">
           <div className="row">
             <div className="col-7">
-              SUTD ID :<strong>{certificate.recipient.studentId}</strong>
+              <span style={Arial15pt}>SUTD ID :<strong>{document.recipient.studentId}</strong></span>
             </div>
           </div>
           <div className="row">
             <div className="col-7">
-              Date of Birth :
+              <span style={Arial15pt}>Date of Birth :{" "}
               <strong>
-                {formatDateFullMonthProper(certificate.recipient.Birthdate)}
-              </strong>
+                {formatDateFullMonthProper(document.recipient.Birthdate)}
+              </strong></span>
             </div>
           </div>
           <div className="row">
-            <div className="col-5">
-              Date of Admission :{" "}
+            <div className="col-7">
+              <span style={Arial15pt}>Date of Admission :{" "}
               <strong>
-                {formatDateFullMonthProper(certificate.recipient.AdmissionDate)}
-              </strong>
+                {formatDateFullMonthProper(document.recipient.AdmissionDate)}
+              </strong></span>
             </div>
           </div>
         </div>
@@ -285,63 +390,58 @@ const Transcript = ({ certificate }) => (
       <div className="row">
         <div className="col-2" style={{ marginTop: "1rem" }}>
           {" "}
-          Programme :
+          <span style={Arial15pt}>Programme :</span>
         </div>
         <div className="col-5" style={{ marginTop: "1rem" }}>
           {" "}
-          <strong>{certificate.recipient.Programme}</strong>
-        </div>
-        <div className="col-2" style={{ marginTop: "1rem" }}>
-          {" "}
-          Status :
+          <span style={Arial15pt}><strong>{document.recipient.Programme}</strong></span>
         </div>
         <div className="col-3" style={{ marginTop: "1rem" }}>
           {" "}
-          <strong>{certificate.recipient.Status}</strong>
+          <span style={Arial15pt}>Status :</span>
         </div>
-      </div>
-      <div className="row">
-        <div className="col-2"> Plan :</div>
-        <div className="col-5">
+        <div className="col-2" style={{ marginTop: "1rem" }}>
           {" "}
-          <strong>{certificate.recipient.Plan}</strong>
+          <span style={Arial15pt}><strong>{document.recipient.Status}</strong></span>
         </div>
       </div>
+	  
+	  <div>
+        <Plan document={document} />
+      </div>
+
 
       <br />
 
       <div className="exam-results-header row">
-        <div className="col-4">Subject Code</div>
-        <div className="col-5">Subject Title</div>
-        <div className="col-1">Level</div>
-        <div className="col-1">Credits</div>
-        <div className="col-1">Grade</div>
+        <div className="col-4"><span style={Arial15pt}>Subject Code</span></div>
+        <div className="col-5"><span style={Arial15pt}>Subject Title</span></div>
+        <div className="col-1"><span style={Arial15pt}>Level</span></div>
+        <div className="col-1"><span style={Arial15pt}>Credits</span></div>
+        <div className="col-1"><span style={Arial15pt}>Grade</span></div>
       </div>
 
-      <div className="container">
-        <SubjectGrades certificate={certificate} />
+      <div>
+        <SubjectGrades document={document} />
       </div>
+	  
+	  <div>
+        <RemarksFooter document={document} />
+      </div>  
 
-      <hr align="center" width="100%" color="black" />
-      <div className="row">
-        <div className="col-5">
-          <span style={Arial15pt}>Remarks:</span>
-        </div>
-      </div>
-      <br />
-      <div className="row">
-        <span style={Arial15ptp}>{certificate.additionalData.Remarks}</span>
-      </div>
 	  <hr align="center" width="100%" color="black" />
-      <br />
-      <div className="row">
-        <span style={Arial14ptp}>{certificate.additionalData.Degree}</span>
-		<hr align="center" width="100%" color="black" />
-      </div>
-	  <hr align="center" width="100%" color="black" />
+	  
+	  <div>
+        <ThesisFooter document={document} />
+      </div>	
+	  
+	  <div>
+        <DegreeFooter document={document} />
+      </div>	
+	<hr align="center" width="100%" color="black" />
       <div className="row d-flex justify-content-center">
         <span style={Arial15pt}>
-          <strong>-End of Records-</strong>
+          <strong>-END OF RECORD-</strong>
         </span>
       </div>
       <div className="row d-flex justify-content-center">
@@ -381,7 +481,6 @@ const Transcript = ({ certificate }) => (
           </span>
         </div>
       </div>
-      <div className="pagebreak" />
       <br />
       <br />
       <br />
@@ -391,21 +490,21 @@ const Transcript = ({ certificate }) => (
       <div className="row">
         <div className="col-5">
           <div>
-            <img src={certificate.additionalData.footer[0].footer} />
+            <img src={document.additionalData.footer[0].footer1} />
           </div>
         </div>
       </div>
       <div className="row">
         <div className="col-5">
           <div>
-            <img src={certificate.additionalData.footer[1].footer} />
+            <img src={document.additionalData.footer[1].footer2} />
           </div>
         </div>
       </div>
       <div className="row">
         <div className="col-5">
           <div>
-            <img src={certificate.additionalData.footer[2].footer} />
+            <img src={document.additionalData.footer[2].footer3} />
           </div>
         </div>
       </div>
@@ -414,7 +513,7 @@ const Transcript = ({ certificate }) => (
 );
 
 Transcript.propTypes = {
-  certificate: PropTypes.object.isRequired
+  document: PropTypes.object.isRequired
 };
 
 export default Transcript;

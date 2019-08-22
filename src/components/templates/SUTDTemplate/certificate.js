@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { Component } from "react";
-
+import { get } from "lodash";
 import {
   SUTD_CERT_BG,
   SUTD_CERT_LOGO,
@@ -91,10 +91,22 @@ const presidentImgStyle = {
 export const formatDateFullMonthProper = dateString => {
   if (!dateString) return null;
   const date = new Date(dateString);
-
 };
 
-const Template = ({ certificate }) => (
+export const Plan =({ document }) => {
+	
+	const DegreePlan = get(document, "recipient.Plan",undefined);
+	return DegreePlan ? (
+      <div className="row d-flex justify-content-center align-items-center">
+        {" "}
+        <span style={GothamMedium165pt}>{document.recipient.Plan}</span>
+      </div>) :null;
+ 	
+};
+
+
+const Template = ({ document }) => (
+
   <div className="container" style={borderImgStyle}>
     <img
       src={SUTD_CERT_LOGO}
@@ -123,7 +135,7 @@ const Template = ({ certificate }) => (
         className="row d-flex justify-content-center align-items-center"
         style={{ height: "100px", lineHeight: "175%" }}
       >
-        <span style={GothamMedium265pt}>{certificate.recipient.name}</span>
+        <span style={GothamMedium265pt}>{document.recipient.name}</span>
       </div>
       <div
         className="row d-flex justify-content-center"
@@ -132,17 +144,18 @@ const Template = ({ certificate }) => (
         <span style={GothamMedium12pt}>the degree of</span>
       </div>
       <div className="row d-flex justify-content-center align-items-center">
-        <span style={GothamMedium22pt}>{certificate.name}</span>
+        <span style={GothamMedium22pt}>{document.name}</span>
       </div>{" "}
+
+	  <div>
+        <Plan document={document} />
+      </div>
+
       <div className="row d-flex justify-content-center align-items-center">
-        {" "}
-        <span style={GothamMedium165pt}>{certificate.recipient.Plan}</span>
+        <span style={GothamMedium165pt}>{document.recipient.Honors}</span>
       </div>
       <div className="row d-flex justify-content-center align-items-center">
-        <span style={GothamMedium165pt}>{certificate.recipient.Honors}</span>
-      </div>
-      <div className="row d-flex justify-content-center align-items-center">
-        <span style={GothamMedium165pt}>{certificate.recipient.SubPlan}</span>
+        <span style={GothamMedium165pt}>{document.recipient.SubPlan}</span>
       </div>
       <br />
       <div className="row d-flex justify-content-center">
@@ -152,7 +165,7 @@ const Template = ({ certificate }) => (
       </div>
       <div className="row d-flex justify-content-center">
         <span style={GothamBold12pt}>
-          {formatDateFullMonthProper(certificate.issuedOn)}
+          {formatDateFullMonthProper(document.issuedOn)}
         </span>
       </div>
     </div>
@@ -168,7 +181,7 @@ const Template = ({ certificate }) => (
 
       <div className="col-2">
         <div>
-          <img src={SUTD_PRESIDENT} style={presidentImgStyle} />
+          <img src={SUTD_PRESIDENT}  style={presidentImgStyle} />
         </div>
       </div>
     </div>
@@ -177,13 +190,13 @@ const Template = ({ certificate }) => (
       <div style={{ marginRight: "13rem" }}>&nbsp;</div>
       <div style={{ marginRight: "31rem" }}>
         <div>
-          <span style={GothamMedium10pt}>Chair, Board of Trustees </span>
+          <span style={GothamMedium10pt}>{document.additionalData.Signatorytype[0].type} </span>
         </div>
       </div>
 
       <div>
         <div>
-          <span style={GothamMedium10pt}>President</span>
+          <span style={GothamMedium10pt}>{document.additionalData.Signatorytype[1].type}</span>
         </div>
       </div>
     </div>
@@ -192,7 +205,7 @@ const Template = ({ certificate }) => (
       <div className="col-11">&nbsp;</div>
       <div className="co1-4">
         <div>
-          <span style={GothamMedium8pt}>Serial No. {certificate.id} </span>
+          <span style={GothamMedium8pt}>Serial No. {document.id} </span>
         </div>
       </div>
     </div>
@@ -203,5 +216,5 @@ const Template = ({ certificate }) => (
 
 export default Template;
 Template.propTypes = {
-  certificate: PropTypes.object.isRequired
+  document: PropTypes.object.isRequired
 };
